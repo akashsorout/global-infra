@@ -47,7 +47,7 @@ echo "ENV: $ENV"
 
 
 # Replace placeholder in the template file
-if [ $OSTYPE == "darwin"* ]; then
+if [[ $OSTYPE == "darwin"* ]]; then
     sed -i '' 's/<app>/'$APP'/g' $CF_TEMPLATE
     sed -i '' 's/<env>/'$ENV'/g' $CF_TEMPLATE
 else
