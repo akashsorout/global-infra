@@ -58,3 +58,4 @@ fi
 
 # Apply the CloudFormation template
 aws cloudformation deploy --template-file $CF_TEMPLATE --stack-name $STACK
+git restore .
