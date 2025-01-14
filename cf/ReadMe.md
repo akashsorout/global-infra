@@ -1,0 +1,1 @@
+`./deploy.sh vpc.yaml base-infra bhub d1`
