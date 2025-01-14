@@ -2,6 +2,14 @@
 
 # Exit immediately if a command exits with a non-zero status
 set -e
+# Function to handle cleanup
+function cleanup {
+    echo "Restoring changes..."
+    git restore .
+}
+# Trap both ERR and EXIT signals to always run cleanup
+
+trap cleanup ERR EXIT
 
 # Check if the template argument is provided
 if [ -z "$1" ]; then
@@ -55,7 +63,6 @@ else
     sed -i 's/<env>/'$ENV'/g' $CF_TEMPLATE
 fi
 
-
 # Apply the CloudFormation template
 aws cloudformation deploy --template-file $CF_TEMPLATE --stack-name $STACK
-git restore $CF_TEMPLATE
+
