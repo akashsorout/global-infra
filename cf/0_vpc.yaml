@@ -1,0 +1,159 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  App:
+    Type: String
+    Value: <app>
+  Env:
+    Type: String
+    Value: <env>
+
+Resources:
+  bytehubVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: env
+          Value: !Ref Env
+        - Key: app
+          Value: !Ref App
+        - Key: stack
+          Value: AWS::StackName
+
+  bytehubInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn:
+      - !Ref bytehubVpc
+    Tags:
+      - Key: env
+        Value: !Ref Env
+      - Key: app
+        Value: !Ref App
+      - Key: stack
+        Value: AWS::StackName
+
+  bytehubIgAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref bytehubVpc
+      InternetGatewayId: !Ref bytehubInternetGateway
+      Tags:
+        - Key: env
+          Value: !Ref Env
+        - Key: app
+          Value: !Ref App
+        - Key: stack
+          Value: AWS::StackName
+
+  bytehubSubnetPublicA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref bytehubVpc
+      CidrBlock: 10.0.0.0/18
+      AvailabilityZone: "ap-south-1a"
+      Tags:
+        - Key: env
+          Value: !Ref Env
+        - Key: app
+          Value: !Ref App
+        - Key: stack
+          Value: AWS::StackName
+
+  bytehubSubnetPublicB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref bytehubVpc
+      CidrBlock: 10.0.64.0/18
+      AvailabilityZone: "ap-south-1b"
+      Tags:
+        - Key: env
+          Value: !Ref Env
+        - Key: app
+          Value: !Ref App
+        - Key: stack
+          Value: AWS::StackName
+
+  bytehubSubnetPrivateA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref bytehubVpc
+      CidrBlock: 10.0.128.0/18
+      AvailabilityZone: "ap-south-1a"
+      Tags:
+        - Key: env
+          Value: !Ref Env
+        - Key: app
+          Value: !Ref App
+        - Key: stack
+          Value: AWS::StackName
+
+  bytehubSubnetPrivateB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref bytehubVpc
+      CidrBlock: 10.0.192.0/18
+      AvailabilityZone: "ap-south-1b"
+      Tags:
+        - Key: env
+          Value: !Ref Env
+        - Key: app
+          Value: !Ref App
+        - Key: stack
+          Value: AWS::StackName
+
+  bytehubRouteTablePublic:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref bytehubVpc
+      Tags:
+        - Key: env
+          Value: !Ref Env
+        - Key: app
+          Value: !Ref App
+        - Key: stack
+          Value: AWS::StackName
+
+  bytehubRouteTablePrivate:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref bytehubVpc
+      Tags:
+        - Key: env
+          Value: !Ref Env
+        - Key: app
+          Value: !Ref App
+        - Key: stack
+          Value: AWS::StackName
+
+  bytehubRoutesPublic:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref bytehubRouteTablePublic
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref bytehubInternetGateway
+
+  bytehubSubnetRouteAssociatePublicA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref bytehubSubnetPublicA
+      RouteTableId: !Ref bytehubRoutesPublic
+
+  bytehubSubnetRouteAssociatePublicB:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref bytehubSubnetPublicB
+      RouteTableId: !Ref bytehubRoutesPublic
+
+  bytehubSubnetRouteAssociatePrivateA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref bytehubRouteTablePrivate
+      SubnetId: !Ref bytehubSubnetPrivateA
+
+  bytehubSubnetRouteAssociatePrivateB:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref bytehubRouteTablePrivate
+      SubnetId: !Ref bytehubSubnetPrivateB
